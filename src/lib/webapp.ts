@@ -70,15 +70,37 @@ export async function webappFetch<T>(
 }
 
 export interface PullResponse {
-  rows: Array<{ table: string; client_id: string; updated_at: string; deleted_at: string | null; [k: string]: unknown }>;
-  watermark: string | null;
+  table: string;
+  rows: Array<Record<string, unknown>>;
+  serverTime: string;
 }
 
-/** Pull changed rows since a watermark (same contract as the webapp's pull). */
-export function pullFromWebapp(payload: { since?: string | null }): Promise<PullResponse> {
-  return webappFetch<PullResponse>("/api/sync/pull", {
+/**
+ * Pull changed rows for one table since a watermark.
+ * Contract: GET /api/sync/pull?table=<t>&since=<ISO> → { table, rows, serverTime }
+ */
+export function pullFromWebapp(table: string, since?: string | null): Promise<PullResponse> {
+  const params = new URLSearchParams({ table });
+  if (since) params.set("since", since);
+  return webappFetch<PullResponse>(`/api/sync/pull?${params.toString()}`);
+}
+
+export interface PushResponse {
+  table: string;
+  applied: number;
+  skipped: number;
+  serverTime: string;
+}
+
+/**
+ * Push rows for one table. The server applies LWW: newer than stored wins,
+ * older/equal → skipped. user_id is forced server-side from the token.
+ * Contract: POST /api/sync/push { table, rows } → { table, applied, skipped }
+ */
+export function pushToWebapp(table: string, rows: Array<Record<string, unknown>>): Promise<PushResponse> {
+  return webappFetch<PushResponse>("/api/sync/push", {
     method: "POST",
-    body: JSON.stringify({ since: payload.since ?? null }),
+    body: JSON.stringify({ table, rows }),
   });
 }
 
