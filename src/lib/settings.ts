@@ -9,6 +9,12 @@ export interface ExtensionSettings {
   syncToken: string;
   /** Master toggle for conversational features (E3 ghostwriter, E4 autofill). */
   autofillEnabled: boolean;
+  /** Optional LLM config for extension-generated replies (E2/E3/E6). */
+  llm?: {
+    baseUrl: string;
+    apiKey: string;
+    model: string;
+  };
   /** Toggles per feature; true = on by default after first config. */
   features: {
     ghostwriter: boolean;
@@ -21,6 +27,11 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   webappUrl: "",
   syncToken: "",
   autofillEnabled: false,
+  llm: {
+    baseUrl: "https://openrouter.ai/api/v1",
+    apiKey: "",
+    model: "nvidia/nemotron-3-super-120b-a12b:free",
+  },
   features: { ghostwriter: true, pageWatcher: false, whatsappCrm: true },
 };
 

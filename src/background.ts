@@ -10,6 +10,8 @@
 
 import { loadSettings } from "./lib/settings";
 import { getWebappConfig } from "./lib/webapp";
+import { buildReplyPrompt } from "./lib/crm";
+import { complete, type LlmConfig } from "./lib/llm";
 
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
@@ -30,9 +32,43 @@ chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) =
       void getWebappConfig().then((c) => sendResponse({ webappConfig: c }));
       return true;
     }
+    if (type === "GENERATE_REPLY") {
+      const { lead } = message as { lead?: { name?: string; context?: string } };
+      void generateReply(lead?.name ?? "the contact", lead?.context ?? "")
+        .then((text) => sendResponse({ ok: true, text }))
+        .catch((err: unknown) =>
+          sendResponse({ ok: false, error: err instanceof Error ? err.message : String(err) }),
+        );
+      return true; // async response
+    }
   }
   return false;
 });
+
+async function generateReply(name: string, context: string): Promise<string> {
+  const s = await loadSettings();
+  // E2 reply generation needs the user's LLM config (set in options). If there
+  // is no key yet, fall back to a clearly-signed local draft (never a crash).
+  if (!s.llm?.apiKey) {
+    const fallbackMsgs = context ? `\n\nContext: ${context.slice(0, 300)}` : "";
+    return `[Add an AI key in Zonaed AI options to generate this reply.]${fallbackMsgs}`;
+  }
+  const cfg: LlmConfig = { baseUrl: s.llm.baseUrl, apiKey: s.llm.apiKey, model: s.llm.model };
+  const prompt = buildReplyPrompt({
+    id: "wa:" + name.toLowerCase().replace(/\s+/g, " "),
+    name,
+    status: "new",
+    lastActiveAt: new Date().toISOString(),
+    notes: [],
+    tags: [],
+    createdAt: new Date().toISOString(),
+    context,
+  });
+  return complete(cfg, [
+    { role: "system", content: "You write short, natural WhatsApp replies. No preamble." },
+    { role: "user", content: prompt },
+  ]);
+}
 
 // Keep the worker from sleeping during long sync runs (later phases).
 chrome.runtime.onSuspend?.addListener(() => {

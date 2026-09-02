@@ -34,6 +34,9 @@ async function init(): Promise<void> {
   $("whatsappCrm").checked = s.features.whatsappCrm;
   $("ghostwriter").checked = s.features.ghostwriter;
   $("pageWatcher").checked = s.features.pageWatcher;
+  $("llmBaseUrl").value = s.llm?.baseUrl ?? "";
+  $("llmApiKey").value = s.llm?.apiKey ?? "";
+  $("llmModel").value = s.llm?.model ?? "";
 }
 
 $("test").addEventListener("click", async () => {
@@ -55,11 +58,18 @@ $("test").addEventListener("click", async () => {
 $("save").addEventListener("click", async () => {
   const cfg = currentConfig();
   const s = await loadSettings();
+  const llmBaseUrl = $("llmBaseUrl").value.trim();
+  const llmApiKey = $("llmApiKey").value.trim();
+  const llmModel = $("llmModel").value.trim();
   await saveSettings({
     ...s,
     webappUrl: cfg.webappUrl,
     syncToken: cfg.syncToken,
     autofillEnabled: $("autofillEnabled").checked,
+    llm:
+      llmBaseUrl || llmApiKey || llmModel
+        ? { baseUrl: llmBaseUrl || "https://openrouter.ai/api/v1", apiKey: llmApiKey, model: llmModel || "nvidia/nemotron-3-super-120b-a12b:free" }
+        : undefined,
     features: {
       whatsappCrm: $("whatsappCrm").checked,
       ghostwriter: $("ghostwriter").checked,

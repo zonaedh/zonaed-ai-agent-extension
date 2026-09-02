@@ -27,6 +27,17 @@
     <input type="password" id="syncToken" placeholder="zsy_…" autocomplete="off" />
     <p class="hint">A <code>zsy_…</code> token issued by the web app, scoped to sync only.</p>
 
+    <div style="border-top:1px solid #e5e7eb;margin-top:1.1rem;padding-top:0.4rem">
+      <p style="font-size:.82rem;font-weight:700">AI reply generation (E2/E3)</p>
+      <p class="hint">Optional. Used only by the extension to draft replies; keys stay in this extension's storage (never content scripts). Any OpenAI-compatible base URL works.</p>
+    </div>
+    <label for="llmBaseUrl">Base URL</label>
+    <input type="text" id="llmBaseUrl" placeholder="https://openrouter.ai/api/v1" autocomplete="off" />
+    <label for="llmApiKey">API key</label>
+    <input type="password" id="llmApiKey" placeholder="sk-…" autocomplete="off" />
+    <label for="llmModel">Model</label>
+    <input type="text" id="llmModel" placeholder="nvidia/nemotron-3-super-120b-a12b:free" autocomplete="off" />
+
     <button id="test">Test connection</button>
     <button id="save" class="secondary">Save</button>
     <div id="status"></div>
