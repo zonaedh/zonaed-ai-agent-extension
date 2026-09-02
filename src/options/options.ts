@@ -34,6 +34,7 @@ async function init(): Promise<void> {
   $("whatsappCrm").checked = s.features.whatsappCrm;
   $("ghostwriter").checked = s.features.ghostwriter;
   $("pageWatcher").checked = s.features.pageWatcher;
+  $("pageWatcherOn").checked = Boolean(s.pageWatcherOn);
   $("llmBaseUrl").value = s.llm?.baseUrl ?? "";
   $("llmApiKey").value = s.llm?.apiKey ?? "";
   $("llmModel").value = s.llm?.model ?? "";
@@ -44,6 +45,21 @@ async function init(): Promise<void> {
   $("pfCompany").value = p.company;
   $("pfWebsite").value = p.website;
   $("pfAddress").value = p.address;
+  // Page watcher URLs (one per line).
+  $("watchUrls").value = (s.watchlist ?? []).map((w) => w.url).join("\n");
+  void refreshWatchStatus();
+  // Recipes (JSON textarea).
+  $("recipes").value = JSON.stringify(s.recipes ?? [], null, 2);
+}
+
+async function refreshWatchStatus(): Promise<void> {
+  const stored = await chrome.storage.local.get("lastWatchCheck");
+  const el = document.getElementById("watchStatus");
+  if (!el) return;
+  el.textContent = stored.lastWatchCheck ? `Last checked: ${stored.lastWatchCheck}` : "Not checked yet.";
+  el.style.fontSize = "0.75rem";
+  el.style.color = "#6b7280";
+  el.style.marginTop = "0.3rem";
 }
 
 $("test").addEventListener("click", async () => {
@@ -68,6 +84,28 @@ $("save").addEventListener("click", async () => {
   const llmBaseUrl = $("llmBaseUrl").value.trim();
   const llmApiKey = $("llmApiKey").value.trim();
   const llmModel = $("llmModel").value.trim();
+
+  // Page watcher URLs (one per line) → WatchEntry list.
+  const watchlist = $("watchUrls").value
+    .split(/\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((url) => {
+      const existing = s.watchlist?.find((w) => w.url === url);
+      return existing ?? { url, label: url, lastHash: null, lastCheckedAt: null, lastChangedAt: null, seeded: false };
+    });
+
+  // Recipes JSON — parse defensively.
+  let recipes = s.recipes ?? [];
+  try {
+    const parsed = JSON.parse($("recipes").value || "[]") as Array<{ id: string; name?: string; urlPattern: string; rowSelector: string; fields: Record<string, string> }>;
+    recipes = Array.isArray(parsed)
+      ? parsed.map((r, i) => ({ id: r.id || `r${i + 1}`, name: r.name ?? r.urlPattern, urlPattern: r.urlPattern, rowSelector: r.rowSelector, fields: r.fields }))
+      : [];
+  } catch {
+    /* keep existing recipes on bad JSON */
+  }
+
   await saveSettings({
     ...s,
     webappUrl: cfg.webappUrl,
@@ -85,6 +123,9 @@ $("save").addEventListener("click", async () => {
       website: $("pfWebsite").value.trim(),
       address: $("pfAddress").value.trim(),
     },
+    watchlist,
+    pageWatcherOn: $("pageWatcherOn").checked,
+    recipes,
     features: {
       whatsappCrm: $("whatsappCrm").checked,
       ghostwriter: $("ghostwriter").checked,
@@ -92,6 +133,7 @@ $("save").addEventListener("click", async () => {
     },
   });
   setStatus("Saved.", "ok");
+  void refreshWatchStatus();
 });
 
 void init();

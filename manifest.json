@@ -26,7 +26,12 @@
     },
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content/ghostwriter.js", "content/autofill.js"],
+      "js": ["content/ghostwriter.js", "content/autofill.js", "content/scraper.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["content/youtube.js"],
       "run_at": "document_idle"
     }
   ],

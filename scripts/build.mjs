@@ -26,6 +26,10 @@ const entries = [
   resolve(root, "src/background.ts"),
   resolve(root, "src/options/options.ts"),
   resolve(root, "src/content/whatsapp.ts"),
+  resolve(root, "src/content/ghostwriter.ts"),
+  resolve(root, "src/content/autofill.ts"),
+  resolve(root, "src/content/scraper.ts"),
+  resolve(root, "src/content/youtube.ts"),
 ];
 
 async function buildOnce() {

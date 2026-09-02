@@ -3,6 +3,12 @@
 // Kept plain and dependency-free so every bundle stays small.
 // ============================================================================
 
+import type { WatchEntry } from "./watcher";
+
+// type WatchEntry is defined in ./watcher; re-export for consumers importing
+// everything from settings.
+export type { WatchEntry };
+
 export interface ExtensionSettings {
   /** Webapp base URL + sync token (see lib/webapp.ts). */
   webappUrl: string;
@@ -24,12 +30,28 @@ export interface ExtensionSettings {
     website: string;
     address: string;
   };
+  /** Page watcher (E5) — pinned URLs polled via chrome.alarms. */
+  watchlist?: WatchEntry[];
+  pageWatcherOn?: boolean;
+  /** Structured scraping recipes (E6) — CSS selector sets per site. */
+  recipes?: ScraperRecipe[];
   /** Toggles per feature; true = on by default after first config. */
   features: {
     ghostwriter: boolean;
     pageWatcher: boolean;
     whatsappCrm: boolean;
   };
+}
+
+/** One scraping recipe: which selectors to read on which site. */
+export interface ScraperRecipe {
+  id: string;
+  name: string;
+  /** Substring the tab URL must contain. */
+  urlPattern: string;
+  /** Row selector repeated per record + named field selectors. */
+  rowSelector: string;
+  fields: Record<string, string>;
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {

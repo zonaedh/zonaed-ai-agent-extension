@@ -60,6 +60,24 @@
     </div>
 
     <div style="border-top:1px solid #e5e7eb;margin-top:1.1rem;padding-top:0.4rem">
+      <p style="font-size:.82rem;font-weight:700">Page watcher URLs (E5)</p>
+      <p class="hint">One URL per line. The extension polls every 5 minutes and notifies when the page content changes.</p>
+    </div>
+    <textarea id="watchUrls" rows="4" placeholder="https://example.com/pricing&#10;https://competitor.com/blog" style="width:100%;padding:0.5rem 0.6rem;border:1px solid #d0d7de;border-radius:6px;font-size:0.85rem;box-sizing:border-box;font-family:inherit;margin-top:0.25rem"></textarea>
+    <div class="row">
+      <div>Page watcher enabled</div>
+      <input type="checkbox" id="pageWatcherOn" />
+    </div>
+    <div id="watchStatus"></div>
+
+    <div style="border-top:1px solid #e5e7eb;margin-top:1.1rem;padding-top:0.4rem">
+      <p style="font-size:.82rem;font-weight:700">Structured scraping recipes (E6)</p>
+      <p class="hint">JSON array. Each recipe: { id, name, urlPattern, rowSelector, fields }. Used by the background SCRAPE_TAB.</p>
+    </div>
+    <textarea id="recipes" rows="6" spellcheck="false" placeholder='[{"id":"r1","name":"example","urlPattern":"example.com","rowSelector":"tr","fields":{"title":"td a","price":"td.price"}}]' style="width:100%;padding:0.5rem 0.6rem;border:1px solid #d0d7de;border-radius:6px;font-size:0.8rem;box-sizing:border-box;font-family:monospace;margin-top:0.25rem"></textarea>
+    <div id="recipesStatus" style="font-size:0.78rem;color:#6b7280;margin-top:0.2rem"></div>
+
+    <div style="border-top:1px solid #e5e7eb;margin-top:1.1rem;padding-top:0.4rem">
       <p style="font-size:.82rem;font-weight:700">Autofill profile (E4)</p>
       <p class="hint">Filled into matching form fields when you click the toolbar icon. Nothing is submitted automatically.</p>
     </div>
