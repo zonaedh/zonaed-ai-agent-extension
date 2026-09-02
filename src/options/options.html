@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zonaed AI — Options</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; color: #1f2328; }
+      h1 { font-size: 1.2rem; }
+      label { display: block; margin-top: 1rem; font-weight: 600; font-size: 0.85rem; }
+      input[type='text'], input[type='password'], select { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid #d0d7de; border-radius: 6px; font-size: 0.9rem; box-sizing: border-box; margin-top: 0.25rem; }
+      .row { border: 1px solid #d0d7de; border-radius: 8px; padding: 0.75rem 0.9rem; margin-top: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+      button { margin-top: 1rem; padding: 0.55rem 1rem; border: 0; border-radius: 6px; background: #4f46e5; color: #fff; font-weight: 600; cursor: pointer; }
+      button.secondary { background: #e5e7eb; color: #1f2328; }
+      #status { margin-top: 0.9rem; font-size: 0.85rem; }
+      .ok { color: #15803d; } .err { color: #b91c1c; }
+      p.hint { font-size: 0.78rem; color: #6b7280; margin-top: 0.3rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Zonaed AI — Options</h1>
+    <label for="webappUrl">Web app base URL</label>
+    <input type="text" id="webappUrl" placeholder="https://zonaed-ai-agent.vercel.app" autocomplete="url" />
+    <p class="hint">Your Zonaed AI web app (deployed on Vercel).</p>
+
+    <label for="syncToken">Sync token</label>
+    <input type="password" id="syncToken" placeholder="zsy_…" autocomplete="off" />
+    <p class="hint">A <code>zsy_…</code> token issued by the web app, scoped to sync only.</p>
+
+    <button id="test">Test connection</button>
+    <button id="save" class="secondary">Save</button>
+    <div id="status"></div>
+
+    <div class="row">
+      <div>Autofill forms (E4)</div>
+      <input type="checkbox" id="autofillEnabled" />
+    </div>
+    <div class="row">
+      <div>WhatsApp CRM (E2)</div>
+      <input type="checkbox" id="whatsappCrm" />
+    </div>
+    <div class="row">
+      <div>Ghostwriter copilot (E3)</div>
+      <input type="checkbox" id="ghostwriter" />
+    </div>
+    <div class="row">
+      <div>Page watcher (E5)</div>
+      <input type="checkbox" id="pageWatcher" />
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

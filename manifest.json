@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Zonaed AI Agent",
+  "version": "0.4.0",
+  "description": "Zonaed AI companion — WhatsApp lead CRM, inline ghostwriter, form autofill, page watcher, OCR, structured scraping, YouTube repurposing. Syncs with the Zonaed AI web app.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://*.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content/whatsapp.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Open Zonaed AI options",
+    "default_popup": "options/options.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
