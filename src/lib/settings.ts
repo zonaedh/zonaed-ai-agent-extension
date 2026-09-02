@@ -15,6 +15,15 @@ export interface ExtensionSettings {
     apiKey: string;
     model: string;
   };
+  /** Autofill profile (E4) — filled into forms on explicit toolbar click. */
+  profile?: {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    website: string;
+    address: string;
+  };
   /** Toggles per feature; true = on by default after first config. */
   features: {
     ghostwriter: boolean;
@@ -32,6 +41,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
     apiKey: "",
     model: "nvidia/nemotron-3-super-120b-a12b:free",
   },
+  profile: { name: "", email: "", phone: "", company: "", website: "", address: "" },
   features: { ghostwriter: true, pageWatcher: false, whatsappCrm: true },
 };
 

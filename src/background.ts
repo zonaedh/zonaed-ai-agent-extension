@@ -11,12 +11,22 @@
 import { loadSettings } from "./lib/settings";
 import { getWebappConfig } from "./lib/webapp";
 import { buildReplyPrompt } from "./lib/crm";
+import { buildEditPrompt, editSystemPrompt } from "./lib/edit";
 import { complete, type LlmConfig } from "./lib/llm";
 
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === "install") {
     void loadSettings(); // prime chrome.storage with defaults
     void chrome.runtime.openOptionsPage();
+  }
+});
+
+// Toolbar click = autofill the active tab's form (E4, user-initiated).
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id !== undefined) {
+    void chrome.tabs.sendMessage(tab.id, { type: "AUTOFILL_FORM" }).catch(() => {
+      // No content script on this page (chrome:// etc.) — ignore.
+    });
   }
 });
 
@@ -36,6 +46,15 @@ chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) =
       const { lead } = message as { lead?: { name?: string; context?: string } };
       void generateReply(lead?.name ?? "the contact", lead?.context ?? "")
         .then((text) => sendResponse({ ok: true, text }))
+        .catch((err: unknown) =>
+          sendResponse({ ok: false, error: err instanceof Error ? err.message : String(err) }),
+        );
+      return true; // async response
+    }
+    if (type === "GHOSTWRITE") {
+      const { mode, text } = message as { mode?: string; text?: string };
+      void ghostwrite((mode ?? "rewrite") as "rewrite" | "expand" | "shorten", text ?? "")
+        .then((out) => sendResponse({ ok: true, text: out }))
         .catch((err: unknown) =>
           sendResponse({ ok: false, error: err instanceof Error ? err.message : String(err) }),
         );
@@ -68,6 +87,20 @@ async function generateReply(name: string, context: string): Promise<string> {
     { role: "system", content: "You write short, natural WhatsApp replies. No preamble." },
     { role: "user", content: prompt },
   ]);
+}
+
+async function ghostwrite(mode: "rewrite" | "expand" | "shorten", text: string): Promise<string> {
+  const s = await loadSettings();
+  if (!s.llm?.apiKey) throw new Error("Add an AI key in Zonaed AI options first.");
+  const cfg: LlmConfig = { baseUrl: s.llm.baseUrl, apiKey: s.llm.apiKey, model: s.llm.model };
+  return complete(
+    cfg,
+    [
+      { role: "system", content: editSystemPrompt() },
+      { role: "user", content: buildEditPrompt(mode, text) },
+    ],
+    400,
+  );
 }
 
 // Keep the worker from sleeping during long sync runs (later phases).

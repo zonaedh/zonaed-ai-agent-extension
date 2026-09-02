@@ -37,6 +37,13 @@ async function init(): Promise<void> {
   $("llmBaseUrl").value = s.llm?.baseUrl ?? "";
   $("llmApiKey").value = s.llm?.apiKey ?? "";
   $("llmModel").value = s.llm?.model ?? "";
+  const p = s.profile ?? { name: "", email: "", phone: "", company: "", website: "", address: "" };
+  $("pfName").value = p.name;
+  $("pfEmail").value = p.email;
+  $("pfPhone").value = p.phone;
+  $("pfCompany").value = p.company;
+  $("pfWebsite").value = p.website;
+  $("pfAddress").value = p.address;
 }
 
 $("test").addEventListener("click", async () => {
@@ -70,6 +77,14 @@ $("save").addEventListener("click", async () => {
       llmBaseUrl || llmApiKey || llmModel
         ? { baseUrl: llmBaseUrl || "https://openrouter.ai/api/v1", apiKey: llmApiKey, model: llmModel || "nvidia/nemotron-3-super-120b-a12b:free" }
         : undefined,
+    profile: {
+      name: $("pfName").value.trim(),
+      email: $("pfEmail").value.trim(),
+      phone: $("pfPhone").value.trim(),
+      company: $("pfCompany").value.trim(),
+      website: $("pfWebsite").value.trim(),
+      address: $("pfAddress").value.trim(),
+    },
     features: {
       whatsappCrm: $("whatsappCrm").checked,
       ghostwriter: $("ghostwriter").checked,

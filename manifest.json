@@ -23,11 +23,15 @@
       "matches": ["https://web.whatsapp.com/*"],
       "js": ["content/whatsapp.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/ghostwriter.js", "content/autofill.js"],
+      "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_title": "Open Zonaed AI options",
-    "default_popup": "options/options.html"
+    "default_title": "Zonaed AI — click to autofill this form"
   },
   "icons": {
     "16": "icons/icon16.png",
